@@ -70,6 +70,9 @@ import Foundation
     /// The currently selected index indicator view.
     public let indicatorView = IndicatorView()
     
+    /// Wether to allow to deselect all segments
+    public var canDeselectAll = false
+    
     /// A list of options to configure the control with.
     public var options: [BetterSegmentedControlOption]? {
         get { return nil }
@@ -190,6 +193,7 @@ import Foundation
     private var lastIndex: Int {
         return segments.endIndex - 1
     }
+    private var isAllDeselected = false
     
     // MARK: Lifecycle
     /// Initializes a new `BetterSegmentedControl` with the parameters passed.
@@ -299,10 +303,27 @@ import Foundation
     ///   - animated: (Optional) Whether the change should be animated or not. Defaults to `true`.
     public func setIndex(_ index: Int, animated: Bool = true) {
         guard normalSegments.indices.contains(index) else { return }
-        
+        if canDeselectAll {
+            handleDeselection(index: index)
+        }
         let oldIndex = self.index
-        self.index = index
+        self.index = isAllDeselected ? -1 : index
+        guard !isAllDeselected else {
+            return
+        }
         moveIndicatorViewToIndex(animated, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
+    }
+    
+    private func handleDeselection(index: Int) {
+        if index == self.index && !isAllDeselected {
+            indicatorView.isHidden = true
+            selectedSegmentsView.isHidden = true
+            isAllDeselected = true
+        } else if isAllDeselected {
+            indicatorView.isHidden = false
+            selectedSegmentsView.isHidden = false
+            isAllDeselected = false
+        }
     }
     
     // MARK: Animations
