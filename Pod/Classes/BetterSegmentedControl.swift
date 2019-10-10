@@ -193,7 +193,6 @@ import Foundation
     private var lastIndex: Int {
         return segments.endIndex - 1
     }
-    private var isAllDeselected = false
     
     // MARK: Lifecycle
     /// Initializes a new `BetterSegmentedControl` with the parameters passed.
@@ -307,17 +306,15 @@ import Foundation
         self.index = index
         
         if canDeselectAll {
-            if !isAllDeselected && index == oldIndex && oldIndex != -1 {
+            if index == oldIndex && oldIndex != -1 {
                 indicatorView.isHidden = true
                 selectedSegmentsView.isHidden = true
-                isAllDeselected = true
                 self.index = -1
                 sendActions(for: .valueChanged)
                 return
             } else {
                 indicatorView.isHidden = false
                 selectedSegmentsView.isHidden = false
-                isAllDeselected = false
             }
         }
         
