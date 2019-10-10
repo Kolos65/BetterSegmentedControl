@@ -303,28 +303,29 @@ import Foundation
     ///   - animated: (Optional) Whether the change should be animated or not. Defaults to `true`.
     public func setIndex(_ index: Int, animated: Bool = true) {
         guard normalSegments.indices.contains(index) else { return }
-        if canDeselectAll {
-            handleDeselection(index: index)
-        }
         let oldIndex = self.index
-        self.index = isAllDeselected ? -1 : index
-        guard !isAllDeselected else {
-            return
+        self.index = index
+        
+        if canDeselectAll {
+            if !isAllDeselected && index == oldIndex && oldIndex != -1 {
+                indicatorView.isHidden = true
+                selectedSegmentsView.isHidden = true
+                isAllDeselected = true
+                self.index = -1
+                sendActions(for: .valueChanged)
+                return
+            } else {
+                indicatorView.isHidden = false
+                selectedSegmentsView.isHidden = false
+                isAllDeselected = false
+            }
         }
+        
         moveIndicatorViewToIndex(animated, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
     }
     
-    private func handleDeselection(index: Int) {
-        if index == self.index && !isAllDeselected {
-            indicatorView.isHidden = true
-            selectedSegmentsView.isHidden = true
-            isAllDeselected = true
-        } else if isAllDeselected {
-            indicatorView.isHidden = false
-            selectedSegmentsView.isHidden = false
-            isAllDeselected = false
-        }
-    }
+    
+    
     
     // MARK: Animations
     private func moveIndicatorViewToIndex(_ animated: Bool, shouldSendEvent: Bool) {
