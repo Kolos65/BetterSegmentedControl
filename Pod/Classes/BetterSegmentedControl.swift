@@ -313,8 +313,10 @@ import Foundation
                 sendActions(for: .valueChanged)
                 return
             } else {
+                moveIndicatorViewToIndex(oldIndex != -1, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
                 indicatorView.isHidden = false
                 selectedSegmentsView.isHidden = false
+                return
             }
         }
         
