@@ -116,7 +116,13 @@ import Foundation
     /// Whether to send the .ValueChanged event immediately or wait for animations to complete. Defaults to `true`.
     @IBInspectable public var announcesValueImmediately: Bool = true
     /// Whether the the control should ignore pan gestures. Defaults to `false`.
-    @IBInspectable public var panningDisabled: Bool = false
+    @IBInspectable public var panningDisabled: Bool = false {
+        didSet {
+            guard panningDisabled else { return }
+            panGestureRecognizer.delegate = nil
+            removeGestureRecognizer(panGestureRecognizer)
+        }
+    }
     /// The control's and indicator's corner radii.
     @IBInspectable public var cornerRadius: CGFloat {
         get {
