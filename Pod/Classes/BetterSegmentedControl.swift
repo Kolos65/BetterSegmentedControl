@@ -301,26 +301,39 @@ import Foundation
     ///   - index: The new index.
     ///   - animated: (Optional) Whether the change should be animated or not. Defaults to `true`.
     public func setIndex(_ index: Int, animated: Bool = true) {
+        guard !canDeselectAll else {
+            setIndexAndDeselect(index, animated: animated)
+            return
+        }
+        
         guard normalSegments.indices.contains(index) else { return }
+        
         let oldIndex = self.index
         self.index = index
         
-        if canDeselectAll {
-            if index == oldIndex && oldIndex != -1 {
-                indicatorView.isHidden = true
-                selectedSegmentsView.isHidden = true
-                self.index = -1
-                sendActions(for: .valueChanged)
-                return
-            } else {
-                moveIndicatorViewToIndex(oldIndex != -1, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
-                indicatorView.isHidden = false
-                selectedSegmentsView.isHidden = false
-                return
-            }
+        moveIndicatorViewToIndex(animated, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
+    }
+    
+    private func setIndexAndDeselect(_ index: Int, animated: Bool = true) {
+        guard index == -1 || normalSegments.indices.contains(index) else { return }
+        
+        let oldIndex = self.index
+        self.index = index
+        
+        if index == -1 || index == oldIndex {
+            indicatorView.isHidden = true
+            selectedSegmentsView.isHidden = true
+            self.index = -1
+            sendActions(for: .valueChanged)
+            return
         }
         
-        moveIndicatorViewToIndex(animated, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
+        let isAnimated = animated && oldIndex != -1
+        let shouldSendEvent = self.index != oldIndex || alwaysAnnouncesValue
+        moveIndicatorViewToIndex(isAnimated, shouldSendEvent: shouldSendEvent)
+        
+        indicatorView.isHidden = false
+        selectedSegmentsView.isHidden = false
     }
     
     
