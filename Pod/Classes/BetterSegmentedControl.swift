@@ -308,7 +308,7 @@ import Foundation
     ///   - animated: (Optional) Whether the change should be animated or not. Defaults to `true`.
     public func setIndex(_ index: Int, animated: Bool = true, silently: Bool = false) {
         guard !canDeselectAll else {
-            setIndexAndDeselect(index, animated: animated)
+            setIndexAndDeselect(index, animated: animated, silently: silently)
             return
         }
         
@@ -317,10 +317,11 @@ import Foundation
         let oldIndex = self.index
         self.index = index
         
-        moveIndicatorViewToIndex(animated, shouldSendEvent: !silently && (self.index != oldIndex || alwaysAnnouncesValue))
+        let shouldSendEvent = self.index != oldIndex || alwaysAnnouncesValue
+        moveIndicatorViewToIndex(animated, shouldSendEvent: !silently && shouldSendEvent)
     }
     
-    private func setIndexAndDeselect(_ index: Int, animated: Bool = true) {
+    private func setIndexAndDeselect(_ index: Int, animated: Bool = true, silently: Bool = false) {
         guard index == -1 || normalSegments.indices.contains(index) else { return }
         
         let oldIndex = self.index
@@ -330,13 +331,13 @@ import Foundation
             indicatorView.isHidden = true
             selectedSegmentsView.isHidden = true
             self.index = -1
-            sendActions(for: .valueChanged)
+            if !silently { sendActions(for: .valueChanged) }
             return
         }
         
         let isAnimated = animated && oldIndex != -1
         let shouldSendEvent = self.index != oldIndex || alwaysAnnouncesValue
-        moveIndicatorViewToIndex(isAnimated, shouldSendEvent: shouldSendEvent)
+        moveIndicatorViewToIndex(isAnimated, shouldSendEvent: !silently && shouldSendEvent)
         
         indicatorView.isHidden = false
         selectedSegmentsView.isHidden = false
