@@ -306,7 +306,7 @@ import Foundation
     /// - Parameters:
     ///   - index: The new index.
     ///   - animated: (Optional) Whether the change should be animated or not. Defaults to `true`.
-    public func setIndex(_ index: Int, animated: Bool = true) {
+    public func setIndex(_ index: Int, animated: Bool = true, silently: Bool = false) {
         guard !canDeselectAll else {
             setIndexAndDeselect(index, animated: animated)
             return
@@ -317,7 +317,7 @@ import Foundation
         let oldIndex = self.index
         self.index = index
         
-        moveIndicatorViewToIndex(animated, shouldSendEvent: (self.index != oldIndex || alwaysAnnouncesValue))
+        moveIndicatorViewToIndex(animated, shouldSendEvent: !silently && (self.index != oldIndex || alwaysAnnouncesValue))
     }
     
     private func setIndexAndDeselect(_ index: Int, animated: Bool = true) {
